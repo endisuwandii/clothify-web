@@ -1,7 +1,7 @@
-import { Form } from "react-router";
+import { Form, redirect } from "react-router";
+import Cookies from "js-cookie";
 
 import type { Product } from "~/modules/product/type";
-
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { formatPrice } from "~/lib/format";
@@ -18,11 +18,47 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const slug = params.slug;
 
   const response = await fetch(
-    `${import.meta.env.VITE_BACKEND_API_URL}/products/${slug}`
+    `${import.meta.env.VITE_BACKEND_API_URL}/products/${slug}`,
   );
   const product: Product = await response.json();
 
   return { product };
+}
+
+// PENANGKAP DATA FORM ADA DI SINI
+export async function clientAction({ request }: Route.ClientActionArgs) {
+  // 1. Ambil data dari form (quantity dan productId yang tersembunyi)
+  const formData = await request.formData();
+  const quantity = Number(formData.get("quantity"));
+  const productId = formData.get("productId") as string;
+
+  // 2. Cek token login
+  const token = Cookies.get("token");
+  if (!token) {
+    // Kalau belum login, lempar ke halaman login
+    return redirect("/login");
+  }
+
+  // 3. Tembak API buat masukin ke keranjang
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/cart`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      productId: productId,
+      quantity: quantity,
+    }),
+  });
+
+  // 4. Kalau sukses, langsung pindah ke halaman keranjang
+  if (response.ok) {
+    return redirect("/cart");
+  }
+
+  // Kalau gagal, minimal kita return null biar nggak crash
+  return null;
 }
 
 export default function ProductsSlugRoute({
@@ -73,6 +109,9 @@ export default function ProductsSlugRoute({
 
             {/* Add to Cart Form */}
             <Form method="post" className="flex flex-col gap-2 items-start">
+              {/* HIDDEN INPUT: Buat ngirim ID ke clientAction tanpa kelihatan user */}
+              <input type="hidden" name="productId" value={product.id} />
+
               <div>
                 <label
                   htmlFor="quantity"
@@ -93,7 +132,9 @@ export default function ProductsSlugRoute({
                 />
               </div>
 
-              <Button type="submit">Add to Cart</Button>
+              <Button type="submit" disabled={product.stock === 0}>
+                Add to Cart
+              </Button>
             </Form>
 
             {/* Product Info */}
