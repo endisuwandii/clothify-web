@@ -40,17 +40,20 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   }
 
   // 3. Tembak API buat masukin ke keranjang
-  const response = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/cart`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${import.meta.env.VITE_BACKEND_API_URL}/cart/item`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: productId,
+        quantity: quantity,
+      }),
     },
-    body: JSON.stringify({
-      productId: productId,
-      quantity: quantity,
-    }),
-  });
+  );
 
   // 4. Kalau sukses, langsung pindah ke halaman keranjang
   if (response.ok) {
