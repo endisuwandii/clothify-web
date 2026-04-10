@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import type { Route } from "./+types/login";
-import { Form, redirect } from "react-router";
+import { Form, Link, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -12,7 +12,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function LoginRoute({}: Route.ComponentProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div className="min-h-screen grid place-items-center bg-zinc-50 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
         <h1 className="text-2xl font-semibold text-center mb-6 text-gray-800">
           Login
@@ -54,9 +54,9 @@ export default function LoginRoute({}: Route.ComponentProps) {
 
         <p className="text-sm text-center text-gray-500 mt-4">
           Don’t have an account? ?{" "}
-          <a href="/register" className="text-primary hover:underline">
+          <Link to="/register" className="text-primary hover:underline">
             Register here
-          </a>
+          </Link>
         </p>
       </div>
     </div>
@@ -79,7 +79,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(loginBody),
-    }
+    },
   );
 
   const loginResponse: LoginResponse = await response.text();
