@@ -1,4 +1,4 @@
-import { Form, redirect } from "react-router";
+import { Form, Link, redirect } from "react-router";
 import type { Route } from "./+types/register";
 
 import { Button } from "~/components/ui/button";
@@ -12,7 +12,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function RegisterRoute({}: Route.ComponentProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div className="min-h-screen grid place-items-center bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
         <h1 className="text-2xl font-semibold text-center mb-6 text-gray-800">
           Register
@@ -75,9 +75,9 @@ export default function RegisterRoute({}: Route.ComponentProps) {
 
         <p className="text-sm text-center text-gray-500 mt-4">
           Already have an account ?{" "}
-          <a href="/login" className="text-primary hover:underline">
+          <Link to="/login" className="text-primary hover:underline">
             Login here
-          </a>
+          </Link>
         </p>
       </div>
     </div>
@@ -100,7 +100,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(registerBody),
-    }
+    },
   );
 
   const registerResponse: RegisterResponse = await response.json();
